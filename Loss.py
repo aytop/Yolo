@@ -44,17 +44,15 @@ class MyLoss(nn.Module):
             torch.pow(target[:, 14, :, :] - prediction[:, 14, :, :], 2)
 
         loss_conf_noobj = loss_conf_noobj.sum()
+        
+        loss = loss_xy + loss_wh + loss_cls + loss_conf_obj + loss_conf_noobj
 
         if self.print_counter % PRINT_STEP == 0:
-            print('Loss xy:', loss_xy)
-            print('Loss wh:', loss_wh)
-            print('Loss cls:', loss_cls)
-            print('Loss conf obj:', loss_conf_obj)
-            print('Loss conf noobj:', loss_conf_noobj)
+            print('Loss:', loss)
 
         self.print_counter += 1
 
-        return loss_xy + loss_wh + loss_cls + loss_conf_obj + loss_conf_noobj
+        return loss
 
 
 class ConfidenceLoss(nn.Module):
