@@ -21,9 +21,8 @@ class Trainer:
             loss.backward()
             self.optimizer.step()
             if index % 10 == 0:
-                print('Train : [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(index * len(image),
+                print('Train : [{}/{} ({:.0f}%)]'.format(index * len(image),
                                                                        len(self.data_loader.dataset),
-                                                                       100. * index / len(self.data_loader),
-                                                                       loss.data()))
+                                                                       100. * index / len(self.data_loader)))
         print('Training finished!')
         torch.save(self.net.state_dict(), 'yolo.pt')
