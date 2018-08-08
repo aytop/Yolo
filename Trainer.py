@@ -27,4 +27,4 @@ class Trainer:
                                                                        len(self.data_loader.dataset),
                                                                        100. * index / len(self.data_loader)))
         print('Training finished!')
-        torch.save(self.net.state_dict(), 'yolo.pt')
+        torch.save(self.net.state_dict(), 'Yolo/yolo.pt')
