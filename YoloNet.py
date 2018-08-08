@@ -2,6 +2,7 @@ from torch import nn
 from torch.nn import functional as f
 from torchsummary import summary
 
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 class YOLONet(nn.Module):
     def __init__(self):
