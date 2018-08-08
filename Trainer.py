@@ -14,7 +14,7 @@ class Trainer:
         print('Training started!')
         self.net.train()
         for index, dic in enumerate(self.data_loader):
-            image, label = Variable(dic['image'].float()), Variable(dic['label'].float())
+            image, label = Variable(dic['image'].float()).cuda(), Variable(dic['label'].float()).cuda()
             self.optimizer.zero_grad()
             output = self.net(image)
             loss = self.criterion(output, label)
