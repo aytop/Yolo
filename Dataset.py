@@ -62,9 +62,9 @@ class DetectionDataSet(ds.Dataset):
                     transform (callable, optional): Optional transform to be applied
                         on a sample.
         """
-        self.paths = abs_path + paths
-        self.label_dir = abs_path + label_dir
-        self.root_dir = abs_path + root_dir
+        self.paths = paths
+        self.label_dir = label_dir
+        self.root_dir = root_dir
         self.transform = transform
 
     def __len__(self):
