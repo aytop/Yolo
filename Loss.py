@@ -44,15 +44,17 @@ class MyLoss(nn.Module):
             torch.pow(target[:, 14, :, :] - prediction[:, 14, :, :], 2)
 
         loss_conf_noobj = loss_conf_noobj.sum()
-        
-        loss = loss_xy + loss_wh + loss_cls + loss_conf_obj + loss_conf_noobj
 
         if self.print_counter % PRINT_STEP == 0:
-            print('Loss:', loss)
+            print('Loss xy:', loss_xy)
+            print('Loss wh:', loss_wh)
+            print('Loss cls:', loss_cls)
+            print('Loss conf obj:', loss_conf_obj)
+            print('Loss conf noobj:', loss_conf_noobj)
 
         self.print_counter += 1
 
-        return loss
+        return loss_xy + loss_wh + loss_cls + loss_conf_obj + loss_conf_noobj
 
 
 class ConfidenceLoss(nn.Module):
@@ -82,6 +84,58 @@ class ConfidenceLoss(nn.Module):
         self.print_counter += 1
 
         return loss_conf_obj+loss_conf_noobj
+
+
+class AnchorLoss(nn.Module):
+    def __init__(self):
+        super(AnchorLoss, self).__init__()
+        self.print_counter = 0
+
+    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+        loss = 0
+        for anchor in range(0, 31, 15):
+            loss_xy = \
+                coord_coef * \
+                target[:, anchor + 14, :, :] * \
+                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - f.sigmoid(target[:, 10:12, :, :]), 2)
+
+            loss_xy = loss_xy.sum()
+
+            loss_wh = \
+                coord_coef * \
+                target[:, anchor + 14, :, :] * \
+                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - f.sigmoid(target[:, 12:14, :, :]), 2)
+
+            loss_wh = loss_wh.sum()
+
+            loss_cls = \
+                cls_coef * \
+                target[:, anchor + 14, :, :] * \
+                torch.pow(f.softmax(prediction[:, anchor:anchor + 10, :, :], dim=1) - target[:, anchor:anchor + 10, :, :], 2)
+
+            loss_cls = loss_cls.sum()
+
+            loss_conf_obj = \
+                obj_coef * \
+                target[:, anchor + 14, :, :] * \
+                torch.pow(f.sigmoid(target[:, anchor + 14, :, :]) - f.sigmoid(prediction[:, anchor + 14, :, :]), 2)
+
+            loss_conf_obj = loss_conf_obj.sum()
+
+            loss_conf_noobj = \
+                noobj_coef * \
+                (1 - target[:, anchor + 14, :, :]) * \
+                torch.pow(target[:, anchor + 14, :, :] - prediction[:, anchor + 14, :, :], 2)
+
+            loss_conf_noobj = loss_conf_noobj.sum()
+            loss += loss_xy + loss_wh + loss_cls + loss_conf_obj + loss_conf_noobj
+
+        if self.print_counter % PRINT_STEP == 0:
+                print('Loss:', loss)
+
+        self.print_counter += 1
+
+        return loss
 
 
 def mse(a, b, average):

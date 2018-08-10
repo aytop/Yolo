@@ -27,7 +27,7 @@ def get_boxes(output, data_size):
                                       findAbsoluteCoor(data_size, output, i, j), output[0, 14, i, j]
             class_prob = f.softmax(class_prob)
             clas = np.array(class_prob).argmax()
-            if not (tl == 0 and br == 0 and c == 0):
+            if not (tl == br and c == 0):
                 boxes.append({'confidence': c, 'top-left': tl, 'bottom-right': br, 'class': clas})
     return boxes
 
@@ -50,19 +50,19 @@ def sort_boxes(boxes):
 
 
 # returns non-maximal suppressed list of boxes
-def NMS(output, confidence_threshold=0.6, iou_threshold=0.5):
+def NMS(output, data_size,  confidence_threshold=0.3, iou_threshold=0.4):
     conf_mask = (output[:, 14, :, :] > confidence_threshold).float()
     output = output * conf_mask  # delete boxes with low confidence
-    boxes = get_boxes(output)
+    boxes = get_boxes(output, data_size)
     boxes = sort_boxes(boxes)
+    boxes = [[box, True] for box in boxes]
     ret = []
-    i = 0
-    while i < len(boxes):
-        ret.append(boxes[i])
-        boxes = [x for x in boxes[i:]
-                 if (iou(boxes[i]['top-left'], boxes[i]['bottom-right'], x['top-left'], x['bottom-right'])
-                     < iou_threshold)]
-        i += 1
+    for index, box in enumerate(boxes):
+        if box[1]:
+            ret.append(box[0])
+            for i in range(index+1, len(boxes)):
+                 if (iou(boxes[i][0]['top-left'], boxes[i][0]['bottom-right'], box[0]['top-left'], box[0]['bottom-right']) > iou_threshold):
+                        boxes[i][1] = False
     return ret
 
 
@@ -78,8 +78,8 @@ def findAbsoluteCoor(data_size, label, i, j):
     return box
 
 
-def toImage(image, label, path, index=1):
-    boxes = get_boxes(label, image.size()[2:4])
+def toImage(image, label, path, index):
+    boxes = NMS(label, image.size()[2:4])
     image = np.array(image, dtype='uint8')[0]
     image = np.transpose(image, (1, 2, 0))
     img = Image.fromarray(image, 'RGB')
@@ -90,8 +90,22 @@ def toImage(image, label, path, index=1):
             draw.text(box['top-left'], str(box['class']), fill=(255, 0, 0), font=ImageFont.load_default())
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
     img.save(path+'/'+str(index)+'.png')
-    index += 1
 
+
+def ancToImage(image, label, path, index=1):
+    boxes = []
+    for anchor in range(3):
+        boxes += NMS(label[:, anchor*15:(anchor+1)*15, :, :], image.size()[2:4])
+    image = np.array(image, dtype='uint8')[0]
+    image = np.transpose(image, (1, 2, 0))
+    img = Image.fromarray(image, 'RGB')
+    draw = ImageDraw.Draw(img)
+    for box in boxes:
+        if box['confidence'] > 0.2:
+            draw.rectangle([box['top-left'], box['bottom-right']], outline=(255, 0, 0))
+            draw.text(box['top-left'], str(box['class']), fill=(255, 0, 0), font=ImageFont.load_default())
+    pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+    img.save(path + '/' + str(index) + '.png')
 
 
 
