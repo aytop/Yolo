@@ -21,7 +21,7 @@ class YOLONet(nn.Module):
         self.c52 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
         self.c53 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
         self.c6 = nn.Conv2d(256, 15, kernel_size=3, padding=1)
-        summary(self, (3, 72, 144))
+       # summary(self, (3, 72, 144))
 
     def forward(self, x):
         x = f.relu(self.c1(x))
@@ -68,7 +68,7 @@ class AnchorYoloNet(nn.Module):
         self.c52 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
         self.c53 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
         self.c6 = nn.Conv2d(256, 45, kernel_size=3, padding=1)
-        summary(self, (3, 72, 144))
+        # summary(self, (3, 72, 144))
 
     def forward(self, x):
         x = f.relu(self.c1(x))
