@@ -31,7 +31,7 @@ def ancMain():
         trainer = Trainer.Trainer(net=net, data_set=train_data, optimizer=optimizer, criterion=criterion, save='anc.pt')
         trainer.train()
     else:
-        net.load_state_dict(torch.load('anc.pt'))
+        net.load_state_dict(torch.load('anc_cpu.pt'))
     test_data = Dataset.DetectionDataSet(paths='anc_numpy_test/paths.txt', label_dir='anc_numpy_test/', root_dir='test/')
     tester = Tester.AnchorTester(net=net, test_criterion=criterion, data_set=test_data)
     tester.test()

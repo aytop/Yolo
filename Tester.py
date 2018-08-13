@@ -40,7 +40,7 @@ class AnchorTester:
             with torch.no_grad():
                 output = self.net(data)
                 test_loss += self.criterion(output, target)
-                Util.ancToImage(data, target, 'predictions/ground truth', index=index)
-                Util.ancToImage(data, output, 'predictions/outputs', index=index)
+                Util.ancToImage(data, target, 'anc_predictions/ground truth', index=index)
+                Util.ancToImage(data, output, 'anc_predictions/outputs', index=index)
         test_loss /= len(self.data_loader.dataset)
         print("Average loss:", test_loss)

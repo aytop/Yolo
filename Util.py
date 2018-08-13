@@ -50,7 +50,7 @@ def sort_boxes(boxes):
 
 
 # returns non-maximal suppressed list of boxes
-def NMS(output, data_size,  confidence_threshold=0.3, iou_threshold=0.4):
+def NMS(output, data_size,  confidence_threshold=0.2, iou_threshold=0.4):
     conf_mask = (output[:, 14, :, :] > confidence_threshold).float()
     output = output * conf_mask  # delete boxes with low confidence
     boxes = get_boxes(output, data_size)
