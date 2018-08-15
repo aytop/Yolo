@@ -14,15 +14,29 @@ class Tester:
         print('Testing started!')
         self.net.eval()
         test_loss = 0
+        score = {'hit': 0, 'miss': 0, 'miss_class': 0, 'hit_class': 0}
         for index, dic in enumerate(self.data_loader):
             data, target = Variable(dic['image'].float()), Variable(dic['label'].float())
             with torch.no_grad():
                 output = self.net(data)
                 test_loss += self.criterion(output, target)
-                Util.toImage(data, target, 'predictions/ground truth', index=index)
-                Util.toImage(data, output, 'predictions/outputs', index=index)
-        test_loss /= len(self.data_loader.dataset)
-        print("Average loss:", test_loss)
+                img_score = Util.score(data, target, output, 'anc_predictions', index=index)
+                score['hit'] += img_score['hit']
+                score['miss'] += img_score['miss']
+                score['miss_class'] += img_score['miss_class']
+            test_loss /= len(self.data_loader.dataset)
+            boxes = 0
+            for key in score.keys():
+                boxes += score[key]
+            for key in score.keys():
+                score[key] *= 100 / boxes
+            print("Average loss:", test_loss)
+            print('Score: ')
+            print('{0:.2f}% of numbers located'.format(score['hit'] + score['miss_class']))
+            print('{0:.2f}% of numbers correctly classified'.format(score['hit'] + score['hit_class']))
+            print('{0:.2f}% of numbers located and correctly classified'.format(score['hit']))
+            print('{0:.2f}% of predictions are wrong'.format(score['miss']))
+            return test_loss
 
 
 class AnchorTester:
@@ -35,12 +49,27 @@ class AnchorTester:
         print('Testing started!')
         self.net.eval()
         test_loss = 0
+        score = {'hit': 0, 'miss': 0, 'miss_class': 0, 'hit_class': 0}
         for index, dic in enumerate(self.data_loader):
             data, target = Variable(dic['image'].float()), Variable(dic['label'].float())
             with torch.no_grad():
                 output = self.net(data)
                 test_loss += self.criterion(output, target)
-                Util.ancToImage(data, target, 'anc_predictions/ground truth', index=index)
-                Util.ancToImage(data, output, 'anc_predictions/outputs', index=index)
+                img_score = Util.anc_score(data, target, output, 'anc_predictions', index=index)
+                score['hit'] += img_score['hit']
+                score['miss'] += img_score['miss']
+                score['miss_class'] += img_score['miss_class']
+                score['hit_class'] += img_score['hit_class']
         test_loss /= len(self.data_loader.dataset)
+        boxes = 0
+        for key in score.keys():
+            boxes += score[key]
+        for key in score.keys():
+            score[key] *= 100 / boxes
         print("Average loss:", test_loss)
+        print('Score: ')
+        print('{0:.2f}% of numbers located'.format(score['hit'] + score['miss_class']))
+        print('{0:.2f}% of numbers correctly classified'.format(score['hit'] + score['hit_class']))
+        print('{0:.2f}% of numbers located and correctly classified'.format(score['hit']))
+        print('{0:.2f}% of predictions are wrong'.format(score['miss']))
+        return test_loss

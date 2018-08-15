@@ -78,34 +78,54 @@ def findAbsoluteCoor(data_size, label, i, j):
     return box
 
 
-def toImage(image, label, path, index):
-    boxes = NMS(label, image.size()[2:4])
+def toImage(boxes, image, path, index):
     image = np.array(image, dtype='uint8')[0]
     image = np.transpose(image, (1, 2, 0))
     img = Image.fromarray(image, 'RGB')
     draw = ImageDraw.Draw(img)
     for box in boxes:
-        if box['confidence'] > 0.2:
-            draw.rectangle([box['top-left'], box['bottom-right']], outline=(255, 0, 0))
-            draw.text(box['top-left'], str(box['class']), fill=(255, 0, 0), font=ImageFont.load_default())
+        draw.rectangle([box['top-left'], box['bottom-right']], outline=(255, 0, 0))
+        draw.text(box['top-left'], str(box['class']), fill=(255, 0, 0), font=ImageFont.load_default())
     pathlib.Path(path).mkdir(parents=True, exist_ok=True)
     img.save(path+'/'+str(index)+'.png')
 
 
-def ancToImage(image, label, path, index=1):
-    boxes = []
+def score(image, truth, prediction, path, index, iou_threshold=0.5):
+    pred_boxes = NMS(prediction, image.size()[2:4])
+    truth_boxes = NMS(truth, image.size()[2:4])
+    toImage(pred_boxes, image, path+'/outputs', index)
+    toImage(truth_boxes, image, path+'/ground truth', index)
+    ret = {'hit': 0, 'miss': 0, 'miss_class': 0}
+    for pBox, tBox in zip(pred_boxes, truth_boxes):
+        if iou(pBox['top-left'], pBox['bottom-right'], tBox['top-left'], tBox['bottom-right']) > iou_threshold:
+            if pBox['class'] == tBox['class']:
+                ret['hit'] += 1
+            else:
+                ret['miss_class'] += 1
+        else:
+            ret['miss'] += 1
+    return ret
+
+
+def anc_score(image, truth, prediction, path, index, iou_threshold=0.5):
+    pred_boxes = []
+    truth_boxes = []
     for anchor in range(3):
-        boxes += NMS(label[:, anchor*15:(anchor+1)*15, :, :], image.size()[2:4])
-    image = np.array(image, dtype='uint8')[0]
-    image = np.transpose(image, (1, 2, 0))
-    img = Image.fromarray(image, 'RGB')
-    draw = ImageDraw.Draw(img)
-    for box in boxes:
-        if box['confidence'] > 0.2:
-            draw.rectangle([box['top-left'], box['bottom-right']], outline=(255, 0, 0))
-            draw.text(box['top-left'], str(box['class']), fill=(255, 0, 0), font=ImageFont.load_default())
-    pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-    img.save(path + '/' + str(index) + '.png')
-
-
+        pred_boxes += NMS(prediction[:, anchor * 15:(anchor+1) * 15, :, :], image.size()[2:4])
+        truth_boxes += NMS(truth[:, anchor * 15:(anchor + 1) * 15, :, :], image.size()[2:4])
+    toImage(pred_boxes, image, path+'/outputs', index)
+    toImage(truth_boxes, image, path+'/ground truth', index)
+    ret = {'hit': 0, 'miss': 0, 'miss_class': 0, 'hit_class': 0}
+    for pBox, tBox in zip(pred_boxes, truth_boxes):
+        if iou(pBox['top-left'], pBox['bottom-right'], tBox['top-left'], tBox['bottom-right']) > iou_threshold:
+            if pBox['class'] == tBox['class']:
+                ret['hit'] += 1
+            else:
+                ret['miss_class'] += 1
+        else:
+            if pBox['class'] == tBox['class']:
+                ret['hit_class'] += 1
+            else:
+                ret['miss'] += 1
+    return ret
 
