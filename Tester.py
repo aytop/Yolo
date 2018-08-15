@@ -43,7 +43,7 @@ class Tester:
 
 class AnchorTester:
     def __init__(self, net, data_set, test_criterion):
-        self.net = net
+        self.net = net.cuda()
         self.data_loader = ds.DataLoader(data_set, shuffle=True)
         self.criterion = test_criterion
 
