@@ -54,6 +54,8 @@ class AnchorTester:
         score = {'hit': 0, 'miss': 0, 'miss_class': 0, 'hit_class': 0}
         for index, dic in enumerate(self.data_loader):
             data, target = Variable(dic['image'].float()), Variable(dic['label'].float())
+            data = data.cuda()
+            target = target.cuda()
             with torch.no_grad():
                 output = self.net(data)
                 test_loss += self.criterion(output, target)
