@@ -93,8 +93,8 @@ def toImage(boxes, image, path, index):
 def score(image, truth, prediction, path, index, iou_threshold=0.5):
     pred_boxes = NMS(prediction, image.size()[2:4])
     truth_boxes = NMS(truth, image.size()[2:4])
-    toImage(pred_boxes, image, path+'/outputs', index)
-    toImage(truth_boxes, image, path+'/ground truth', index)
+    # toImage(pred_boxes, image, path+'/outputs', index)
+    # toImage(truth_boxes, image, path+'/ground truth', index)
     ret = {'hit': 0, 'miss': 0, 'miss_class': 0}
     for pBox, tBox in zip(pred_boxes, truth_boxes):
         if iou(pBox['top-left'], pBox['bottom-right'], tBox['top-left'], tBox['bottom-right']) > iou_threshold:
@@ -113,8 +113,8 @@ def anc_score(image, truth, prediction, path, index, iou_threshold=0.5):
     for anchor in range(3):
         pred_boxes += NMS(prediction[:, anchor * 15:(anchor+1) * 15, :, :], image.size()[2:4])
         truth_boxes += NMS(truth[:, anchor * 15:(anchor + 1) * 15, :, :], image.size()[2:4])
-    toImage(pred_boxes, image, path+'/outputs', index)
-    toImage(truth_boxes, image, path+'/ground truth', index)
+    # toImage(pred_boxes, image, path+'/outputs', index)
+    # toImage(truth_boxes, image, path+'/ground truth', index)
     ret = {'hit': 0, 'miss': 0, 'miss_class': 0, 'hit_class': 0}
     for pBox, tBox in zip(pred_boxes, truth_boxes):
         if iou(pBox['top-left'], pBox['bottom-right'], tBox['top-left'], tBox['bottom-right']) > iou_threshold:
