@@ -97,14 +97,14 @@ class AnchorLoss(nn.Module):
             loss_xy = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - f.sigmoid(target[:, 10:12, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - f.sigmoid(target[:, anchor + 10:anchor + 12, :, :]), 2)
 
             loss_xy = loss_xy.sum()
 
             loss_wh = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - f.sigmoid(target[:, 12:14, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - f.sigmoid(target[:, anchor + 12:anchor + 14, :, :]), 2)
 
             loss_wh = loss_wh.sum()
 
