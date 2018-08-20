@@ -91,20 +91,20 @@ class AnchorLoss(nn.Module):
         super(AnchorLoss, self).__init__()
         self.print_counter = 0
 
-    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+     def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss = 0
         for anchor in range(0, 31, 15):
             loss_xy = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - f.sigmoid(target[:, anchor + 10:anchor + 12, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - target[:, anchor + 10:anchor + 12, :, :], 2)
 
             loss_xy = loss_xy.sum()
 
             loss_wh = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - f.sigmoid(target[:, anchor + 12:anchor + 14, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - target[:, anchor + 12:anchor + 14, :, :], 2)
 
             loss_wh = loss_wh.sum()
 
