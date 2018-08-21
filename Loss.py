@@ -91,7 +91,7 @@ class AnchorLoss(nn.Module):
         super(AnchorLoss, self).__init__()
         self.print_counter = 0
 
-     def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss = 0
         for anchor in range(0, 31, 15):
             loss_xy = \
