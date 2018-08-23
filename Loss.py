@@ -148,8 +148,16 @@ def mse(a, b, average):
 
 
 def tensor_iou(prediction, target, epsilon=1e-5):
-    tx, ty, tw, th = target.cpu().numpy()[:, 10:14, :, :]
-    px, py, pw, ph = prediction.cpu().numpy()[:, 10:14, :, :]
+    t = target.cpu().numpy()[:, 10:14, :, :]
+    p = prediction.cpu().numpy()[:, 10:14, :, :]
+    tx = t[0]
+    ty = t[1]
+    tw = t[2]
+    th = t[3]
+    px = p[0]
+    py = p[1]
+    pw = p[2]
+    ph = p[3]
     tx1, ty1 = tx - tw / 2, ty - th / 2
     bx1, by1 = tx + tw / 2, ty + th / 2
     tx2, ty2 = px - pw / 2, py - ph / 2
