@@ -161,17 +161,8 @@ def tensor_iou(prediction, target, epsilon=1e-5):
     # ret[ret != ret] = 0
     return ret
 
+
 def TensorCrossEntropy(t1, t2):
-    loss = 0
-    for cls in range(10):
-        for i in range(9):
-            for j in range(9):
-                loss += CrossEntropy(t1[0, cls, i, j], t2[0, cls, i, j])
-    return loss
+        nlog = t2*torch.log(t1) + (torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1))
+        return -nlog.sum()
 
-
-def CrossEntropy(yHat, y):
-    if y == 1:
-        return -math.log(yHat)
-    else:
-        return -math.log(1 - yHat)
