@@ -45,6 +45,8 @@ class Tester:
         test_loss = 0
         for dic in self.data_loader:
             data, target = Variable(dic['image'].float()), Variable(dic['label'].float())
+            data = data.cuda()
+            target = target.cuda()
             with torch.no_grad():
                 output = self.net(data)
                 test_loss += self.criterion(output, target)
