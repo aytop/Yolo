@@ -29,7 +29,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            TensorCrossEntropy(prediction[:, :10, :, :], target[:, :10, :, :])
+            TensorCrossEntropy(f.softmax(prediction[:, :10, :, :], dim=1), target[:, :10, :, :])
 
         loss_cls = loss_cls.sum()
 
@@ -43,7 +43,7 @@ class MyLoss(nn.Module):
         loss_conf_noobj = \
             noobj_coef * \
             (1 - target[:, 14, :, :]) * \
-            torch.pow(target[:, 14, :, :]*tensor_iou() - prediction[:, 14, :, :], 2)
+            torch.pow(target[:, 14, :, :]*tensor_iou(prediction, target) - prediction[:, 14, :, :], 2)
 
         loss_conf_noobj = loss_conf_noobj.sum()
 
