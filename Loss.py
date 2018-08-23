@@ -11,7 +11,7 @@ class MyLoss(nn.Module):
         self.average = average
         self.print_counter = 0
 
-    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+        def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss_xy = \
             coord_coef * \
             target[:, 14, :, :] * \
@@ -36,14 +36,17 @@ class MyLoss(nn.Module):
         loss_conf_obj = \
             obj_coef * \
             target[:, 14, :, :] * \
-            torch.pow(f.sigmoid(target[:, 14, :, :]*tensor_iou(prediction, target)) - f.sigmoid(prediction[:, 14, :, :]), 2)
+            torch.pow(
+                    f.sigmoid(target[:, 14, :, :] *\
+                    (torch.ones_like(target[:, 14,:,:])-tensor_iou(prediction, target))) -\
+                    f.sigmoid(prediction[:, 14, :, :]), 2)
 
         loss_conf_obj = loss_conf_obj.sum()
 
         loss_conf_noobj = \
             noobj_coef * \
             (1 - target[:, 14, :, :]) * \
-            torch.pow(target[:, 14, :, :]*tensor_iou(prediction, target) - prediction[:, 14, :, :], 2)
+            torch.pow(target[:, 14, :, :] * tensor_iou(prediction, target) - prediction[:, 14, :, :], 2)
 
         loss_conf_noobj = loss_conf_noobj.sum()
 
