@@ -11,7 +11,7 @@ class MyLoss(nn.Module):
         self.average = average
         self.print_counter = 0
 
-            def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss_xy = \
             coord_coef * \
             target[:, 14, :, :] * \
