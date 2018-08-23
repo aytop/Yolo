@@ -27,7 +27,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            torch.nn.CrossEntropyLoss.__call__(prediction[:, :10, :, :], target[:, :10, :, :])
+            TensorCrossEntropy(prediction[:, :10, :, :], target[:, :10, :, :])
 
         loss_cls = loss_cls.sum()
 
@@ -160,3 +160,18 @@ def tensor_iou(prediction, target, epsilon=1e-5):
     ret = i / (p1 + p2 - i + epsilon)
     # ret[ret != ret] = 0
     return ret
+
+def TensorCrossEntropy(t1, t2):
+    loss = 0
+    for cls in range(10):
+        for i in range(9):
+            for j in range(9):
+                loss += CrossEntropy(t1[0, cls, i, j], t2[0, cls, i, j])
+    return loss
+
+
+def CrossEntropy(yHat, y):
+    if y == 1:
+        return -math.log(yHat)
+    else:
+        return -math.log(1 - yHat)
