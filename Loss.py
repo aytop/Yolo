@@ -1,6 +1,8 @@
 import torch
 from torch.nn import functional as f
 from torch import nn
+import math
+import numpy as np
 
 
 class MyLoss(nn.Module):
@@ -9,7 +11,7 @@ class MyLoss(nn.Module):
         self.average = average
         self.print_counter = 0
 
-    def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
+            def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss_xy = \
             coord_coef * \
             target[:, 14, :, :] * \
@@ -27,7 +29,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            torch.pow(f.softmax(prediction[:, :10, :, :], dim=1) - target[:, :10, :, :], 2)
+            TensorCrossEntropy(f.softmax(prediction[:, :10, :, :], dim=1), target[:, :10, :, :])
 
         loss_cls = loss_cls.sum()
 
@@ -97,14 +99,14 @@ class AnchorLoss(nn.Module):
             loss_xy = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - f.sigmoid(target[:, 10:12, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 10:anchor + 12, :, :]) - target[:, anchor + 10:anchor + 12, :, :], 2)
 
             loss_xy = loss_xy.sum()
 
             loss_wh = \
                 coord_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - f.sigmoid(target[:, 12:14, :, :]), 2)
+                torch.pow(f.sigmoid(prediction[:, anchor + 12:anchor + 14, :, :]) - target[:, anchor + 12:anchor + 14, :, :], 2)
 
             loss_wh = loss_wh.sum()
 
@@ -146,8 +148,16 @@ def mse(a, b, average):
 
 
 def tensor_iou(prediction, target, epsilon=1e-5):
-    tx, ty, tw, th = target[:, 10:14, :, :]
-    px, py, pw, ph = prediction[:, 10:14, :, :]
+    t = target[0, 10:14, :, :]
+    p = prediction[0, 10:14, :, :]
+    tx = t[0]
+    ty = t[1]
+    tw = t[2]
+    th = t[3]
+    px = p[0]
+    py = p[1]
+    pw = p[2]
+    ph = p[3]
     tx1, ty1 = tx - tw / 2, ty - th / 2
     bx1, by1 = tx + tw / 2, ty + th / 2
     tx2, ty2 = px - pw / 2, py - ph / 2
@@ -160,3 +170,8 @@ def tensor_iou(prediction, target, epsilon=1e-5):
     ret = i / (p1 + p2 - i + epsilon)
     # ret[ret != ret] = 0
     return ret
+
+
+def TensorCrossEntropy(t1, t2):
+        nlog = t2*torch.log(t1) + (torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1))
+        return -nlog.sum()
