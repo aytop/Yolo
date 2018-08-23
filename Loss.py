@@ -2,6 +2,7 @@ import torch
 from torch.nn import functional as f
 from torch import nn
 import math
+import numpy as np
 
 
 class MyLoss(nn.Module):
@@ -147,8 +148,8 @@ def mse(a, b, average):
 
 
 def tensor_iou(prediction, target, epsilon=1e-5):
-    tx, ty, tw, th = target[:, 10:14, :, :]
-    px, py, pw, ph = prediction[:, 10:14, :, :]
+    tx, ty, tw, th = target.numpy[:, 10:14, :, :]
+    px, py, pw, ph = prediction.numpy[:, 10:14, :, :]
     tx1, ty1 = tx - tw / 2, ty - th / 2
     bx1, by1 = tx + tw / 2, ty + th / 2
     tx2, ty2 = px - pw / 2, py - ph / 2
