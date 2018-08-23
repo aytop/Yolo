@@ -14,16 +14,17 @@ class Trainer:
     def train(self):
         print('Training started!')
         self.net.train()
-        loss = 0
+        l = 0
         for index, dic in enumerate(self.data_loader):
             image, label = Variable(dic['image'].float()), Variable(dic['label'].float())
             image = image.cuda()
             label = label.cuda()
             self.optimizer.zero_grad()
             output = self.net(image)
-            loss += self.criterion(output, label)
-            loss.backward(retain_graph=True)
+            loss = self.criterion(output, label)
+            loss.backward(retain_graph=True)            
             self.optimizer.step()
+            l+= loss
             if index % 10 == 0:
                 print('Train : [{}/{} ({:.0f}%)]'.format(index * len(image),
                                                                        len(self.data_loader.dataset),
