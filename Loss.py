@@ -8,6 +8,7 @@ class MyLoss(nn.Module):
         super(MyLoss, self).__init__()
         self.average = average
         self.print_counter = 0
+        self.cross = torch.nn.CrossEntropyLoss()
 
     def forward(self, prediction, target, coord_coef=5, noobj_coef=0.5, obj_coef=5, cls_coef=1., PRINT_STEP=10):
         loss_xy = \
@@ -27,7 +28,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            torch.nn.CrossEntropyLoss.__call__(prediction[:, :10, :, :], target[:, :10, :, :])
+            self.cross(prediction[:, :10, :, :], target[:, :10, :, :])
 
         loss_cls = loss_cls.sum()
 
