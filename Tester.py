@@ -40,6 +40,17 @@ class Tester:
             print('{0:.2f}% of predictions are wrong'.format(score['miss']))
             return test_loss
 
+    def validate(self):
+        self.net.eval()
+        test_loss = 0
+        for dic in self.data_loader:
+            data, target = Variable(dic['image'].float()), Variable(dic['label'].float())
+            with torch.no_grad():
+                output = self.net(data)
+                test_loss += self.criterion(output, target)
+        test_loss /= len(self.data_loader.dataset)
+        return test_loss
+
 
 class AnchorTester:
     def __init__(self, net, data_set, test_criterion):
