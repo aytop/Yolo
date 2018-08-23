@@ -28,7 +28,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            self.cross(prediction[:, :10, :, :], target[:, :10, :, :])
+            self.cross(prediction[:, :10, :, :], target[:, :10, :, :].long())
 
         loss_cls = loss_cls.sum()
 
