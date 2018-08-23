@@ -22,7 +22,7 @@ class Trainer:
             self.optimizer.zero_grad()
             output = self.net(image)
             loss = self.criterion(output, label)
-            loss.backward(retain_graph=True)            
+            loss.backward()            
             self.optimizer.step()
             l+= loss
             if index % 10 == 0:
