@@ -27,7 +27,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            torch.pow(f.softmax(prediction[:, :10, :, :], dim=1) - target[:, :10, :, :], 2)
+            torch.nn.CrossEntropyLoss.__call__(prediction[:, :10, :, :], target[:, :10, :, :])
 
         loss_cls = loss_cls.sum()
 
