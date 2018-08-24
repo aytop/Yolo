@@ -17,6 +17,7 @@ class Alex(AlexNet):
         self.classifier = nn.Conv2d(256, 15, kernel_size=3, padding=1)
 
     def forward(self, x):
+        print(x.shape)
         x = self.features(x)
         print(x.shape)
         input()
