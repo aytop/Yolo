@@ -18,6 +18,8 @@ class Alex(AlexNet):
 
     def forward(self, x):
         x = self.features(x)
+	print(x.shape)
+	input()
         x = x.view(x.size(0), 256, 9, 9)
         x = self.classifier(x)
         return x
