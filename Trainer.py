@@ -29,6 +29,6 @@ class Trainer:
                 print('Train : [{}/{} ({:.0f}%)]'.format(index * len(image),
                                                                        len(self.data_loader.dataset),
                                                                        100. * index / len(self.data_loader)))
-                print('Avarage loss: ', loss/(index+1))
+                print('Avarage loss: ', l/(index+1))
         print('Training finished!')
         torch.save(self.net.state_dict(), self.save)
