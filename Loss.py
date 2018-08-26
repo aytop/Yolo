@@ -174,9 +174,9 @@ def tensor_iou(prediction, target, epsilon=1e-5):
 
 
 def TensorCrossEntropy(t1, t2):
-        print(t2*torch.log(t1))
-        print('-'*20)
-        print((torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1)))
-        input()
         nlog = t2*torch.log(t1) + (torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1))
-        return -nlog.sum()
+        nlog = -nlog
+        nlog = nlog.sum()
+        print(nlog)
+        input()
+        return nlog
