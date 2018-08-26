@@ -177,6 +177,4 @@ def TensorCrossEntropy(t1, t2, epsilon = 1e-5):
         nlog = t2*torch.log(t1) + (torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1+epsilon))
         nlog = -nlog
         nlog = nlog.sum()
-        print(nlog)
-        input()
         return nlog
