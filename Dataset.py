@@ -52,7 +52,7 @@ class Rescale(object):
 
 class DetectionDataSet(ds.Dataset):
     def __init__(self, paths='numpy/paths.txt', label_dir='numpy/', root_dir='train/',
-                 transform=transforms.Compose([Rescale((432, 432)), ToTensor()]),
+                 transform=transforms.Compose([Rescale((324, 324)), ToTensor()]),
                  abs_path='/home/aytop/PycharmProjects/Praksa/'):
         """
                 Args:
