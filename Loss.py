@@ -18,8 +18,7 @@ class MyLoss(nn.Module):
             torch.pow(f.sigmoid(prediction[:, 10:12, :, :]) - f.sigmoid(target[:, 10:12, :, :]), 2)
 
         loss_xy = loss_xy.sum()
-        print(f.sigmoid(prediction[:, 12:14, :, :]))
-        input()
+     
 
         loss_wh = \
             coord_coef * \
@@ -28,6 +27,8 @@ class MyLoss(nn.Module):
 
         loss_wh = loss_wh.sum()
 
+        print(f.softmax(prediction[:, :10, :, :], dim=1))
+        input()
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
