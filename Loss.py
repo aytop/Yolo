@@ -1,8 +1,6 @@
 import torch
 from torch.nn import functional as f
 from torch import nn
-import math
-import numpy as np
 
 
 class MyLoss(nn.Module):
@@ -29,7 +27,7 @@ class MyLoss(nn.Module):
         loss_cls = \
             cls_coef * \
             target[:, 14, :, :] * \
-            TensorCrossEntropy(f.softmax(prediction[:, :10, :, :], dim=1), target[:, :10, :, :])
+            torch.pow(f.softmax(prediction[:, :10, :, :], dim=1) - target[:, :10, :, :], 2)
 
         loss_cls = loss_cls.sum()
 
@@ -120,7 +118,7 @@ class AnchorLoss(nn.Module):
             loss_conf_obj = \
                 obj_coef * \
                 target[:, anchor + 14, :, :] * \
-                torch.pow(f.sigmoid(target[:, anchor + 14, :, :]) - f.sigmoid(prediction[:, anchor + 14, :, :]), 2)
+                torch.pow(target[:, anchor + 14, :, :] - f.sigmoid(prediction[:, anchor + 14, :, :]), 2)
 
             loss_conf_obj = loss_conf_obj.sum()
 
@@ -148,16 +146,8 @@ def mse(a, b, average):
 
 
 def tensor_iou(prediction, target, epsilon=1e-5):
-    t = target[0, 10:14, :, :]
-    p = prediction[0, 10:14, :, :]
-    tx = t[0]
-    ty = t[1]
-    tw = t[2]
-    th = t[3]
-    px = p[0]
-    py = p[1]
-    pw = p[2]
-    ph = p[3]
+    tx, ty, tw, th = target[:, 10:14, :, :]
+    px, py, pw, ph = prediction[:, 10:14, :, :]
     tx1, ty1 = tx - tw / 2, ty - th / 2
     bx1, by1 = tx + tw / 2, ty + th / 2
     tx2, ty2 = px - pw / 2, py - ph / 2
@@ -175,3 +165,5 @@ def tensor_iou(prediction, target, epsilon=1e-5):
 def TensorCrossEntropy(t1, t2):
         nlog = t2*torch.log(t1) + (torch.ones_like(t2)-t2)*torch.log((torch.ones_like(t1)-t1))
         return -nlog.sum()
+
+
